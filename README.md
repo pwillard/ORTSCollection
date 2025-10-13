@@ -9,6 +9,7 @@ Swapping collections is helpful when needing to export specific parts of a model
 
 You would, for example, move the decal related meshes to the scratchpad collection and the use the SWAP option to make only those items exist under the MAIN collection and everything else now resides under the renamed Scratchpad, allowing you to export just the items under MAIN.
 
+NOTE: If you only want the add-on, you can just download the ZIP file.
 
 Pete Willard
 Oct, 2025
