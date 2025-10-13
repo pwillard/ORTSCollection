@@ -58,7 +58,7 @@ class OBJECT_OT_SwapCollections(bpy.types.Operator):
 class OBJECT_OT_CreateInitialCollections(bpy.types.Operator):
     bl_idname = "object.create_initial_collections"
     bl_label = "Create Initial Collection Setup"
-    bl_description = "Create a default collection structure (MAIN & Scratchpad)"
+    bl_description = "Create a default collection structure (MAIN & Scratchpad) with unique subcollections"
     bl_options = {'REGISTER', 'UNDO'}
 
     def create_collection(self, name, parent_collection=None):
@@ -74,8 +74,8 @@ class OBJECT_OT_CreateInitialCollections(bpy.types.Operator):
 
     def execute(self, context):
         created = []
-        linked = []
 
+        # MAIN and subcollections
         main, main_created = self.create_collection("MAIN")
         if main_created:
             created.append("MAIN")
@@ -83,28 +83,28 @@ class OBJECT_OT_CreateInitialCollections(bpy.types.Operator):
         main_700, c1 = self.create_collection("MAIN_700", parent_collection=main)
         if c1:
             created.append("MAIN_700")
+
         main_2000, c2 = self.create_collection("MAIN_2000", parent_collection=main)
         if c2:
             created.append("MAIN_2000")
 
+        # Scratchpad and independent subcollections
         scratchpad, s_created = self.create_collection("Scratchpad")
         if s_created:
             created.append("Scratchpad")
 
-        for sub in [main_700, main_2000]:
-            if sub.name not in scratchpad.children.keys():
-                scratchpad.children.link(sub)
-                linked.append(sub.name)
+        scratchpad_700, c3 = self.create_collection("Scratchpad_700", parent_collection=scratchpad)
+        if c3:
+            created.append("Scratchpad_700")
 
-        if not created and not linked:
+        scratchpad_2000, c4 = self.create_collection("Scratchpad_2000", parent_collection=scratchpad)
+        if c4:
+            created.append("Scratchpad_2000")
+
+        if not created:
             self.report({'INFO'}, "All collections already exist — nothing to do.")
         else:
-            msg = []
-            if created:
-                msg.append(f"Created: {', '.join(created)}")
-            if linked:
-                msg.append(f"Linked to Scratchpad: {', '.join(linked)}")
-            self.report({'INFO'}, " | ".join(msg))
+            self.report({'INFO'}, f"Created collections: {', '.join(created)}")
 
         for window in bpy.context.window_manager.windows:
             for area in window.screen.areas:
@@ -125,7 +125,6 @@ class VIEW3D_PT_SwapCollections(bpy.types.Panel):
         layout = self.layout
         props = context.scene.swap_collections_props
         icons = getattr(bpy.context.window_manager, "orts_icons", None)
-
         icon_value = icons["collection_tools_icon"].icon_id if icons else 0
 
         layout.label(text="Initial Setup:")
